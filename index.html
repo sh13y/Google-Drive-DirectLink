@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drive Direct Link Generator</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+    
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    :root {
+      --dark-moss-green: #606c38;
+      --pakistan-green: #283618;
+      --cornsilk: #fefae0;
+      --earth-yellow: #dda15e;
+      --tigers-eye: #bc6c25;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--cornsilk) 0%, #f5f2e8 100%);
+      min-height: 100vh;
+    }
+
+    .smooth-transition {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .input-focus:focus {
+      outline: none;
+      border-color: var(--dark-moss-green);
+      box-shadow: 0 0 0 3px rgba(96, 108, 56, 0.1);
+    }
+
+    .button-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(40, 54, 24, 0.15);
+    }
+
+    .button-hover:active {
+      transform: translateY(0);
+    }
+
+    .fade-enter-active, .fade-leave-active {
+      transition: opacity 0.3s ease;
+    }
+
+    .fade-enter-from, .fade-leave-to {
+      opacity: 0;
+    }
+
+    .slide-up-enter-active {
+      transition: all 0.4s ease;
+    }
+
+    .slide-up-enter-from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .toast-enter-active, .toast-leave-active {
+      transition: all 0.3s ease;
+    }
+
+    .toast-enter-from, .toast-leave-to {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+
+    .organic-shadow {
+      box-shadow: 0 4px 20px rgba(40, 54, 24, 0.08);
+    }
+
+    .organic-shadow-lg {
+      box-shadow: 0 8px 30px rgba(40, 54, 24, 0.12);
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, var(--dark-moss-green) 0%, var(--pakistan-green) 100%);
+    }
+
+    .earth-gradient {
+      background: linear-gradient(135deg, var(--earth-yellow) 0%, var(--tigers-eye) 100%);
+    }
+
+    .floating-leaves {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .leaf {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: var(--dark-moss-green);
+      border-radius: 0 100% 0 100%;
+      opacity: 0.05;
+      animation: float 12s infinite ease-in-out;
+    }
+
+    .leaf:nth-child(1) {
+      left: 10%;
+      animation-delay: 0s;
+      animation-duration: 15s;
+    }
+
+    .leaf:nth-child(2) {
+      left: 70%;
+      animation-delay: 5s;
+      animation-duration: 12s;
+    }
+
+    .leaf:nth-child(3) {
+      left: 30%;
+      animation-delay: 10s;
+      animation-duration: 18s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(100vh) rotate(0deg); }
+      50% { transform: translateY(-100px) rotate(180deg); }
+    }
+
+    .text-shadow {
+      text-shadow: 0 2px 4px rgba(40, 54, 24, 0.1);
+    }
+
+    .qr-code-container {
+      transition: all 0.3s ease;
+    }
+
+    .qr-code-container #qrContainer {
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(40, 54, 24, 0.1);
+      overflow: hidden;
+    }
+
+    .qr-code-container #qrContainer canvas,
+    .qr-code-container #qrContainer img {
+      border-radius: 8px;
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Mobile-specific improvements */
+    @media (max-width: 640px) {
+      .container-mobile {
+        padding: 1rem;
+      }
+      
+      .text-mobile {
+        font-size: 0.9rem;
+      }
+      
+      .input-mobile {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+      }
+      
+      .button-mobile {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.95rem;
+      }
+      
+      .card-mobile {
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+      }
+      
+      .qr-mobile {
+        max-width: 180px;
+        margin: 0 auto;
+      }
+      
+      .grid-mobile {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .flex-mobile {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      
+      .text-center-mobile {
+        text-align: center;
+      }
+    }
+
+    /* Tablet improvements */
+    @media (min-width: 641px) and (max-width: 1024px) {
+      .container-tablet {
+        padding: 2rem;
+      }
+      
+      .grid-tablet {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+    }
+
+    /* Touch device improvements */
+    @media (hover: none) and (pointer: coarse) {
+      .button-hover:hover {
+        transform: none;
+        box-shadow: 0 4px 20px rgba(40, 54, 24, 0.08);
+      }
+      
+      .button-hover:active {
+        transform: scale(0.98);
+      }
+    }
+
+    /* High DPI displays */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+      .qr-code-container canvas,
+      .qr-code-container img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+      }
+    }
+
+    /* Landscape phone orientation */
+    @media (max-width: 640px) and (orientation: landscape) {
+      .hero-mobile {
+        margin-bottom: 2rem;
+      }
+      
+      .hero-icon {
+        width: 3rem;
+        height: 3rem;
+      }
+      
+      .hero-title {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Floating Leaves Background -->
+    <div class="floating-leaves fixed inset-0 pointer-events-none">
+      <div class="leaf"></div>
+      <div class="leaf"></div>
+      <div class="leaf"></div>
+    </div>
+
+    <div class="min-h-screen py-4 px-4 sm:py-8 sm:px-6 lg:px-8 relative z-10">
+      <div class="max-w-2xl mx-auto">
+        
+        <!-- Header -->
+        <div class="text-center mb-6 sm:mb-8 lg:mb-12 hero-mobile">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 gradient-bg rounded-2xl sm:rounded-3xl flex items-center justify-center organic-shadow-lg hero-icon">
+            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+            </svg>
+          </div>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-semibold text-shadow mb-2 sm:mb-3 hero-title" style="color: var(--pakistan-green)">
+            Drive Direct Link Generator
+          </h1>
+          <p class="text-base sm:text-lg lg:text-xl max-w-lg mx-auto leading-relaxed px-4 sm:px-0" style="color: var(--dark-moss-green)">
+            Transform your Google Drive sharing links into direct download links
+          </p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-10 organic-shadow-lg mb-6 sm:mb-8 border border-opacity-20 card-mobile" style="border-color: var(--dark-moss-green)">
+          
+          <!-- Input Section -->
+          <div class="space-y-4 sm:space-y-6">
+            <div class="relative">
+              <input
+                v-model="driveLink"
+                type="text"
+                placeholder="Paste your Google Drive link here..."
+                class="input-focus smooth-transition w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5 rounded-xl sm:rounded-2xl border-2 text-sm sm:text-base lg:text-lg placeholder-opacity-60 input-mobile"
+                style="background-color: var(--cornsilk); color: var(--pakistan-green); border-color: var(--earth-yellow); --tw-placeholder-opacity: 0.6;"
+                @keyup.enter="generateLink"
+              />
+              <div class="absolute inset-y-0 right-0 flex items-center pr-4 sm:pr-6 lg:pr-8">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" style="color: var(--dark-moss-green)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                </svg>
+              </div>
+            </div>
+
+            <button
+              @click="generateLink"
+              :disabled="loading"
+              class="button-hover smooth-transition w-full gradient-bg text-white font-medium py-3 sm:py-4 lg:py-5 px-6 sm:px-8 rounded-xl sm:rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base lg:text-lg shadow-lg button-mobile"
+            >
+              <span v-if="!loading" class="flex items-center justify-center space-x-2 sm:space-x-3">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                <span>Generate Direct Link</span>
+              </span>
+              <span v-else class="flex items-center justify-center space-x-2 sm:space-x-3">
+                <div class="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
+                <span>Processing...</span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Result Section -->
+          <transition name="slide-up">
+            <div v-show="directLink && !showErrorToast" class="mt-6 sm:mt-8 space-y-4">
+              <div class="rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border-2 organic-shadow" style="background-color: var(--cornsilk); border-color: var(--earth-yellow)">
+                <div class="flex items-center justify-between mb-3 sm:mb-4">
+                  <h3 class="font-semibold text-base sm:text-lg flex items-center space-x-2" style="color: var(--pakistan-green)">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Direct Download Link</span>
+                  </h3>
+                  <span class="text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded-full" style="background-color: var(--earth-yellow); color: white;">Ready</span>
+                </div>
+                <div class="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 font-mono text-xs sm:text-sm lg:text-base break-all border-2 mb-4 sm:mb-6" style="color: var(--pakistan-green); border-color: var(--dark-moss-green); border-opacity: 0.2;">
+                  {{ directLink }}
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4 sm:mb-6 flex-mobile">
+                  <button
+                    @click="copyToClipboard"
+                    class="button-hover smooth-transition flex-1 earth-gradient text-white font-medium py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl flex items-center justify-center space-x-2 shadow-lg text-sm sm:text-base"
+                  >
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Copy Link</span>
+                  </button>
+                  <button
+                    @click="openPreview"
+                    class="button-hover smooth-transition border-2 font-medium py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl flex items-center justify-center space-x-2 shadow-lg text-sm sm:text-base"
+                    style="border-color: var(--dark-moss-green); color: var(--dark-moss-green); background-color: white;"
+                  >
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                    <span>Test Link</span>
+                  </button>
+                </div>
+
+                <!-- QR Code Section -->
+                <div class="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border-2 qr-code-container" style="border-color: var(--dark-moss-green); border-opacity: 0.2;">
+                  <div class="flex items-center justify-between mb-3 sm:mb-4">
+                    <h4 class="font-semibold text-base sm:text-lg flex items-center space-x-2" style="color: var(--pakistan-green)">
+                      <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                      </svg>
+                      <span>QR Code</span>
+                    </h4>
+                    <button
+                      @click="downloadQR"
+                      class="button-hover smooth-transition text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-md sm:rounded-lg flex items-center space-x-1 sm:space-x-2 shadow-md"
+                      style="background-color: var(--earth-yellow); color: white;"
+                    >
+                      <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                      </svg>
+                      <span>Download</span>
+                    </button>
+                  </div>
+                  <div class="flex justify-center">
+                    <div class="bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl inline-block qr-mobile">
+                      <div v-if="qrLoading" class="flex items-center justify-center w-36 h-36 sm:w-48 sm:h-48">
+                        <div class="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2" style="border-color: var(--dark-moss-green)"></div>
+                      </div>
+                      <div v-else id="qrContainer" class="qr-code-display"></div>
+                    </div>
+                  </div>
+                  <p class="text-center text-xs sm:text-sm mt-3 sm:mt-4 text-mobile" style="color: var(--dark-moss-green)">
+                    Scan this QR code to access the direct download link
+                  </p>
+                </div>
+              </div>
+            </div>
+          </transition>
+        </div>
+
+        <!-- How it works -->
+        <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-10 organic-shadow-lg mb-6 sm:mb-8 border border-opacity-20 card-mobile" style="border-color: var(--dark-moss-green)">
+          <h3 class="font-semibold text-lg sm:text-xl mb-6 sm:mb-8 text-center" style="color: var(--pakistan-green)">How it works</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 grid-mobile">
+            <div class="text-center space-y-3 sm:space-y-4">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mx-auto shadow-lg" style="background-color: var(--cornsilk); border: 2px solid var(--earth-yellow);">
+                <span class="font-semibold text-base sm:text-lg" style="color: var(--pakistan-green)">1</span>
+              </div>
+              <p class="leading-relaxed text-sm sm:text-base" style="color: var(--dark-moss-green)">Paste your Google Drive sharing link into the input field</p>
+            </div>
+            <div class="text-center space-y-3 sm:space-y-4">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mx-auto shadow-lg" style="background-color: var(--cornsilk); border: 2px solid var(--earth-yellow);">
+                <span class="font-semibold text-base sm:text-lg" style="color: var(--pakistan-green)">2</span>
+              </div>
+              <p class="leading-relaxed text-sm sm:text-base" style="color: var(--dark-moss-green)">Click the generate button to process and convert your link</p>
+            </div>
+            <div class="text-center space-y-3 sm:space-y-4">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mx-auto shadow-lg" style="background-color: var(--cornsilk); border: 2px solid var(--earth-yellow);">
+                <span class="font-semibold text-base sm:text-lg" style="color: var(--pakistan-green)">3</span>
+              </div>
+              <p class="leading-relaxed text-sm sm:text-base" style="color: var(--dark-moss-green)">Copy and share your direct download link or QR code anywhere</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-center-mobile">
+          <p class="text-sm sm:text-base lg:text-lg" style="color: var(--dark-moss-green)">
+            © 2025 | made in ceylon with ❤️ by 
+            <a href="https://github.com/sh13y" target="_blank" class="font-semibold smooth-transition hover:underline" style="color: var(--tigers-eye)">
+              sh13y
+            </a>
+          </p>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <transition name="toast" v-for="toast in toasts" :key="toast.id">
+      <div v-if="toast.show" :class="[
+        'fixed bottom-4 right-4 sm:bottom-6 sm:right-6 px-4 py-3 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl shadow-xl text-white font-medium z-50 flex items-center space-x-2 sm:space-x-3 text-sm sm:text-base max-w-xs sm:max-w-sm',
+        toast.type === 'success' ? 'earth-gradient' : 'bg-red-500'
+      ]">
+        <svg v-if="toast.type === 'success'" class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <svg v-else class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="truncate">{{ toast.message }}</span>
+      </div>
+    </transition>
+  </div>
+
+  <script>
+    const { createApp } = Vue
+    
+
+    createApp({
+      data() {
+        return {
+          driveLink: '',
+          directLink: '',
+          loading: false,
+          qrLoading: false,
+          toasts: [],
+          showErrorToast: false,
+          toastId: 0,
+          qrCodeInstance: null,
+          resizeTimeout: null, // <-- add this
+        }
+      },
+      methods: {
+        generateLink() {
+          if (!this.driveLink.trim()) {
+            this.showToast('Please enter a Google Drive link', 'error')
+            return
+          }
+
+          this.loading = true
+          this.directLink = ''
+          this.showErrorToast = false
+
+          setTimeout(() => {
+            const fileId = this.extractFileId(this.driveLink)
+            if (fileId) {
+              this.directLink = `https://drive.usercontent.google.com/download?id=${fileId}&export=download&confirm=t`
+              // Generate QR code after a short delay to ensure DOM is ready
+              setTimeout(() => {
+                this.generateQRCode()
+              }, 300)
+            } else {
+              this.directLink = ''
+              this.showErrorToast = true
+              this.showToast('Invalid Google Drive URL', 'error')
+            }
+            this.loading = false
+
+            // Auto-clear after 30 seconds
+            if (this.directLink) {
+              setTimeout(() => {
+                this.driveLink = ''
+                this.directLink = ''
+                this.clearQRCode()
+              }, 30000)
+            }
+          }, 1000)
+        },
+
+        extractFileId(url) {
+          const patterns = [
+            /\/d\/([a-zA-Z0-9_-]{25,})/,
+            /id=([a-zA-Z0-9_-]{25,})/,
+            /file\/d\/([a-zA-Z0-9_-]{25,})/,
+            /^([a-zA-Z0-9_-]{25,})$/
+          ]
+          for (const pattern of patterns) {
+            const match = url.match(pattern)
+            if (match && match[1]) return match[1]
+          }
+          return null
+        },
+
+        generateQRCode() {
+  this.qrLoading = true;
+
+  nextTick(() => {
+    const container = document.getElementById('qrContainer');
+    if (container && this.directLink && typeof QRCode !== 'undefined') {
+      this.clearQRCode();
+
+      try {
+        const isMobile = window.innerWidth < 640;
+        const qrSize = isMobile ? 150 : 200;
+
+        this.qrCodeInstance = new QRCode(container, {
+          text: this.directLink,
+          width: qrSize,
+          height: qrSize,
+          colorDark: '#283618',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+
+        this.qrLoading = false;
+      } catch (error) {
+        this.qrLoading = false;
+        console.error('QR Code generation error:', error);
+        this.showToast('Failed to generate QR code', 'error');
+      }
+    } else {
+      this.qrLoading = false;
+      if (typeof QRCode === 'undefined') {
+        this.showToast('QR Code library not loaded', 'error');
+      } else {
+        this.showToast('Container not found', 'error');
+      }
+    }
+  })
+},
+
+
+        clearQRCode() {
+          const container = document.getElementById('qrContainer')
+          if (container) {
+            container.innerHTML = ''
+          }
+          this.qrCodeInstance = null
+        },
+
+        downloadQR() {
+          const container = document.getElementById('qrContainer')
+          if (container) {
+            const canvas = container.querySelector('canvas')
+            const img = container.querySelector('img')
+            
+            if (canvas) {
+              const link = document.createElement('a')
+              link.download = 'drive-direct-link-qr.png'
+              link.href = canvas.toDataURL('image/png')
+              link.click()
+              this.showToast('QR code downloaded', 'success')
+            } else {
+              this.showToast('QR code not found', 'error')
+            }
+          }
+        },
+
+        copyToClipboard() {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(this.directLink).then(() => {
+              this.showToast('Link copied to clipboard', 'success')
+            }).catch(() => {
+              this.fallbackCopyToClipboard()
+            })
+          } else {
+            this.fallbackCopyToClipboard()
+          }
+        },
+
+        fallbackCopyToClipboard() {
+          try {
+            const el = document.createElement('textarea')
+            el.value = this.directLink
+            el.setAttribute('readonly', '')
+            el.style.position = 'absolute'
+            el.style.left = '-9999px'
+            document.body.appendChild(el)
+            
+            // For mobile devices
+            if (navigator.userAgent.match(/ipad|ipod|iphone/i)) {
+              el.contentEditable = true
+              el.readOnly = false
+              const range = document.createRange()
+              range.selectNodeContents(el)
+              const sel = window.getSelection()
+              sel.removeAllRanges()
+              sel.addRange(range)
+              el.setSelectionRange(0, 999999)
+            } else {
+              el.select()
+            }
+            
+            document.execCommand('copy')
+            document.body.removeChild(el)
+            this.showToast('Link copied to clipboard', 'success')
+          } catch (error) {
+            console.error('Copy failed:', error)
+            this.showToast('Copy failed. Please copy manually', 'error')
+          }
+        },
+
+        openPreview() {
+          if (this.directLink) {
+            window.open(this.directLink, '_blank', 'noopener,noreferrer')
+          }
+        },
+
+        showToast(message, type = 'success') {
+          const toast = {
+            id: ++this.toastId,
+            message,
+            type,
+            show: true
+          }
+          this.toasts.push(toast)
+          
+          setTimeout(() => {
+            toast.show = false
+            setTimeout(() => {
+              const index = this.toasts.indexOf(toast)
+              if (index > -1) {
+                this.toasts.splice(index, 1)
+              }
+            }, 300)
+          }, 3000)
+        }
+      },
+
+      mounted() {
+        // Handle window resize for responsive QR code
+        window.addEventListener('resize', () => {
+          if (this.directLink && !this.qrLoading) {
+            clearTimeout(this.resizeTimeout)
+            this.resizeTimeout = setTimeout(() => {
+              this.generateQRCode()
+            }, 250)
+          }
+        })
+      },
+
+      // Replace beforeUnmount with unmounted and fix event removal
+      unmounted() {
+        if (this.resizeTimeout) {
+          clearTimeout(this.resizeTimeout)
+        }
+        window.removeEventListener('resize', this.handleResize)
+      }
+    }).mount('#app')
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</body>
+</html>
