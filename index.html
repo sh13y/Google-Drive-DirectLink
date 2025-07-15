@@ -273,7 +273,7 @@
         </div>
 
         <!-- Main Card -->
-        <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-10 organic-shadow-lg mb-6 sm:mb-8 border border-opacity-20 card-mobile" style="border-color: var(--dark-moss-green)">
+        <div class="bg-white rounded-2xl sm:rounded-3xl p-2 sm:p-6 lg:p-10 organic-shadow-lg mb-6 sm:mb-8 border border-opacity-20 card-mobile" style="border-color: var(--dark-moss-green)">
           
           <!-- Input Section -->
           <div class="space-y-4 sm:space-y-6">
@@ -282,7 +282,7 @@
                 v-model="driveLink"
                 type="text"
                 placeholder="Paste your Google Drive link here..."
-                class="input-focus smooth-transition w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5 rounded-xl sm:rounded-2xl border-2 text-sm sm:text-base lg:text-lg placeholder-opacity-60 input-mobile"
+                class="input-focus smooth-transition w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5 rounded-xl sm:rounded-2xl border-2 text-sm sm:text-base lg:text-lg placeholder-opacity-60 input-mobile focus:ring-2 focus:ring-amber-400"
                 style="background-color: var(--cornsilk); color: var(--pakistan-green); border-color: var(--earth-yellow); --tw-placeholder-opacity: 0.6;"
                 @keyup.enter="generateLink"
               />
@@ -296,7 +296,7 @@
             <button
               @click="generateLink"
               :disabled="loading"
-              class="button-hover smooth-transition w-full gradient-bg text-white font-medium py-3 sm:py-4 lg:py-5 px-6 sm:px-8 rounded-xl sm:rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base lg:text-lg shadow-lg button-mobile"
+              class="button-hover smooth-transition w-full gradient-bg text-white font-medium py-3 sm:py-4 lg:py-5 px-6 sm:px-8 rounded-xl sm:rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base lg:text-lg shadow-lg button-mobile focus:ring-2 focus:ring-amber-400"
             >
               <span v-if="!loading" class="flex items-center justify-center space-x-2 sm:space-x-3">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -369,12 +369,12 @@
                       <span>Download</span>
                     </button>
                   </div>
-                  <div class="flex justify-center">
-                    <div class="bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl inline-block qr-mobile">
+                  <div class="flex justify-center items-center">
+                    <div class="bg-white p-2 sm:p-4 rounded-lg sm:rounded-xl shadow-md inline-block qr-mobile w-full max-w-xs sm:max-w-sm lg:max-w-md">
                       <div v-if="qrLoading" class="flex items-center justify-center w-36 h-36 sm:w-48 sm:h-48">
-                        <div class="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2" style="border-color: var(--dark-moss-green)"></div>
+                        <div class="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2" style="border-color: var(--dark-moss-green)"></div>
                       </div>
-                      <div v-else id="qrContainer" class="qr-code-display"></div>
+                      <div v-else id="qrContainer" class="qr-code-display mx-auto"></div>
                     </div>
                   </div>
                   <p class="text-center text-xs sm:text-sm mt-3 sm:mt-4 text-mobile" style="color: var(--dark-moss-green)">
@@ -412,7 +412,7 @@
         </div>
 
         <!-- Footer -->
-        <footer class="text-center text-center-mobile">
+        <footer class="text-center text-center-mobile mt-8 mb-2">
           <p class="text-sm sm:text-base lg:text-lg" style="color: var(--dark-moss-green)">
             © 2025 | made in ceylon with ❤️ by 
             <a href="https://github.com/sh13y" target="_blank" class="font-semibold smooth-transition hover:underline" style="color: var(--tigers-eye)">
@@ -510,42 +510,38 @@
         },
 
         generateQRCode() {
-  this.qrLoading = true;
-
-  nextTick(() => {
-    const container = document.getElementById('qrContainer');
-    if (container && this.directLink && typeof QRCode !== 'undefined') {
-      this.clearQRCode();
-
-      try {
-        const isMobile = window.innerWidth < 640;
-        const qrSize = isMobile ? 150 : 200;
-
-        this.qrCodeInstance = new QRCode(container, {
-          text: this.directLink,
-          width: qrSize,
-          height: qrSize,
-          colorDark: '#283618',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.M
-        });
-
-        this.qrLoading = false;
-      } catch (error) {
-        this.qrLoading = false;
-        console.error('QR Code generation error:', error);
-        this.showToast('Failed to generate QR code', 'error');
-      }
-    } else {
-      this.qrLoading = false;
-      if (typeof QRCode === 'undefined') {
-        this.showToast('QR Code library not loaded', 'error');
-      } else {
-        this.showToast('Container not found', 'error');
-      }
-    }
-  })
-},
+          this.qrLoading = true;
+          this.$nextTick(() => {
+            const container = document.getElementById('qrContainer');
+            if (container && this.directLink && typeof QRCode !== 'undefined') {
+              this.clearQRCode();
+              try {
+                const isMobile = window.innerWidth < 640;
+                const qrSize = isMobile ? 180 : 240;
+                this.qrCodeInstance = new QRCode(container, {
+                  text: this.directLink,
+                  width: qrSize,
+                  height: qrSize,
+                  colorDark: '#283618',
+                  colorLight: '#ffffff',
+                  correctLevel: QRCode.CorrectLevel.M
+                });
+                this.qrLoading = false;
+              } catch (error) {
+                this.qrLoading = false;
+                console.error('QR Code generation error:', error);
+                this.showToast('Failed to generate QR code', 'error');
+              }
+            } else {
+              this.qrLoading = false;
+              if (typeof QRCode === 'undefined') {
+                this.showToast('QR Code library not loaded', 'error');
+              } else {
+                this.showToast('Container not found', 'error');
+              }
+            }
+          });
+        },
 
 
         clearQRCode() {
